@@ -1,6 +1,6 @@
 package de.brands4friends.aig.util;
 
-import de.brands4friends.aig.domain.ApiDoc;
+import de.brands4friends.aig.domain.ResponseDescription;
 
 import java.io.IOException;
 
@@ -14,9 +14,9 @@ public class BuildPipeline {
         this.illustrationGenerator = illustrationGenerator;
     }
 
-    public void execute(String inputFileName, String outputFileName) throws IOException {
+    public void execute(String inputFileName, String outputFileName, int outerboundX) throws IOException {
         System.out.println("reading file");
-        ApiDoc apiDoc = fileProcessor.readFromFile(inputFileName);
-        illustrationGenerator.createIllustration(apiDoc,outputFileName);
+        ResponseDescription responseDescription = fileProcessor.readFromFile(inputFileName);
+        illustrationGenerator.createIllustration(responseDescription,outputFileName,outerboundX);
     }
 }
