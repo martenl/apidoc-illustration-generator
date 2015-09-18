@@ -20,9 +20,10 @@ public class SVGProvider implements CanvasProvider {
     }
 
     @Override
-    public void storeCanvas(Graphics2D canvas, String fileName) throws IOException{
+    public void storeCanvas(Graphics2D canvas, String fileName, int width, int height) throws IOException{
         if(canvas instanceof SVGGraphics2D){
             SVGGraphics2D svgCanvas = (SVGGraphics2D) canvas;
+            svgCanvas.setSVGCanvasSize(new Dimension(height,width));
             svgCanvas.stream(fileName);
         }
     }

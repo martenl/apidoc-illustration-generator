@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JpegProvider implements CanvasProvider {
+public class PngProvider implements CanvasProvider {
 
     Map<Graphics2D,BufferedImage> images = new HashMap<Graphics2D, BufferedImage>();
 
@@ -24,6 +24,6 @@ public class JpegProvider implements CanvasProvider {
     @Override
     public void storeCanvas(Graphics2D canvas, String fileName, int maxWidth, int offsetY) throws IOException {
         BufferedImage canvasImage = images.get(canvas);
-        ImageIO.write(canvasImage,"jpg",new File(fileName));
+        ImageIO.write(canvasImage, "png", new File(fileName));
     }
 }
