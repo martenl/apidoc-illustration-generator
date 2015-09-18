@@ -5,16 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ApiDoc {
+public class ResponseDescription {
 
     private final List<ApiDocCategory> categories;
+    private final Map<String,ResponseElement> definedTypes;
 
-    public ApiDoc(List<ApiDocCategory> categories) {
+    public ResponseDescription(List<ApiDocCategory> categories, Map<String, ResponseElement> definedTypes) {
         this.categories = categories;
+        this.definedTypes = definedTypes;
     }
 
-    public List<ApiDocCategory> getCategories() {
-        return categories;
+    public Map<String, ResponseElement> getTypes() {
+        return definedTypes;
     }
 
     public static Builder builder(){
@@ -23,6 +25,7 @@ public class ApiDoc {
 
     public static class Builder{
         private final Map<String,Map<String,String>> data = new HashMap<String, Map<String, String>>();
+        private final Map<String,ResponseElement> definedTypes = new HashMap<String, ResponseElement>();
 
         public Builder addCall(final String category,final String call, final String response){
             if(!data.containsKey(category)){
@@ -32,9 +35,19 @@ public class ApiDoc {
             return this;
         }
 
-        public ApiDoc build(){
+        public Builder addType(final String name,ResponseElement definition){
+            definedTypes.put(name,definition);
+            return this;
+        }
+
+        public Builder addTypeMap(Map<String,ResponseElement> types){
+            definedTypes.putAll(types);
+            return this;
+        }
+
+        public ResponseDescription build(){
             List<ApiDocCategory> categories = buildCategories();
-            return new ApiDoc(categories);
+            return new ResponseDescription(categories, definedTypes);
         }
 
         private List<ApiDocCategory> buildCategories() {
@@ -51,9 +64,10 @@ public class ApiDoc {
             Map<String,String> apiCallsForCategory = data.get(category);
             for(String apiCall : apiCallsForCategory.keySet()){
                 final String response = apiCallsForCategory.get(apiCall);
-                apiCallDocs.add(new ApiCallDoc(new ApiCall(apiCall),new ApiCallResponse(response)));
+                apiCallDocs.add(new ApiCallDoc(new ApiCall(apiCall),new ApiCallResponse(response,null)));
             }
             return apiCallDocs;
         }
     }
+
 }
