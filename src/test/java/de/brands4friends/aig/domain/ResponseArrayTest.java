@@ -58,7 +58,7 @@ public class ResponseArrayTest {
 
     @Test
     public void testToString() throws Exception {
-        final String expResult = "[]";
+        final String expResult = NAME +" : array["+MIN+" : "+MAX+"]";
         assertEquals(expResult,instance.toString());
     }
 

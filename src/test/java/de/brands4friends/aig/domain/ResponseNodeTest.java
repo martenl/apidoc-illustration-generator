@@ -56,7 +56,7 @@ public class ResponseNodeTest {
 
     @Test
     public void testToString() throws Exception {
-        final String expResult = "{ test-name:test-type\n}";
+        final String expResult = "test-name : test-type";
         assertEquals(expResult,instance.toString());
     }
 }

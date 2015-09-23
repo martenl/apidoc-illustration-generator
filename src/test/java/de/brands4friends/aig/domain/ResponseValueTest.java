@@ -40,7 +40,7 @@ public class ResponseValueTest {
 
     @org.junit.Test
     public void testToString() throws Exception {
-        final String expResult = "\ttest-name:test-type";
+        final String expResult = "test-name:test-type";
         assertEquals(expResult,instance.toString());
     }
 }
