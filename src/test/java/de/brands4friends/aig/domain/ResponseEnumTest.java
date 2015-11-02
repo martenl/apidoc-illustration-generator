@@ -5,8 +5,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class ResponseEnumTest {
 
@@ -42,5 +41,22 @@ public class ResponseEnumTest {
     public void testGetType() throws Exception {
         final String expResult = "[value1 | value2]";
         assertEquals(expResult,instance.getType());
+    }
+
+    @Test
+    public void testIsRequired() throws Exception {
+        assertTrue(instance.isRequired());
+    }
+
+    @Test
+    public void testIsAncestor() throws Exception {
+        final ResponseElement notAChild = new ResponseValue("notAtChild","string",false);
+        assertFalse(instance.isAncestor(notAChild));
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        final String expResult = "test-name : [value1|value2]";
+        assertEquals(expResult,instance.toString());
     }
 }

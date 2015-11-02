@@ -60,4 +60,32 @@ public class ResponseEnum implements ResponseElement {
                 .append("]");
         return name+" : "+builder.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof ResponseEnum)){
+            return false;
+        }
+
+        ResponseEnum that = (ResponseEnum) o;
+
+        if (!name.equals(that.name)){
+            return false;
+        }
+        if (!values.equals(that.values)){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + values.hashCode();
+        return result;
+    }
 }
