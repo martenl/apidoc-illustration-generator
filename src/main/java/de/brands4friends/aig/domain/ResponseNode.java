@@ -59,4 +59,40 @@ public class ResponseNode implements ResponseElement{
     public String toString() {
         return name+" : "+type;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof ResponseNode)){
+            return false;
+        }
+
+        ResponseNode that = (ResponseNode) o;
+
+        if (required != that.required){
+            return false;
+        }
+        if (!children.equals(that.children)){
+            return false;
+        }
+        if (!name.equals(that.name)){
+            return false;
+        }
+        if (!type.equals(that.type)){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + children.hashCode();
+        result = 31 * result + (required ? 1 : 0);
+        return result;
+    }
 }
