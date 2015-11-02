@@ -47,4 +47,34 @@ public class ResponseValue implements ResponseElement{
     public String toString() {
         return  name + ':' + type ;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ResponseValue)){
+            return false;
+        }
+
+        ResponseValue that = (ResponseValue) o;
+
+        if (required != that.required){
+            return false;
+        }
+        if (!name.equals(that.name)){
+            return false;
+        }
+        if (!type.equals(that.type)){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (required ? 1 : 0);
+        return result;
+    }
 }

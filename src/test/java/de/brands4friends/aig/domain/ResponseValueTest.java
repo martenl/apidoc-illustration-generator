@@ -1,10 +1,11 @@
 package de.brands4friends.aig.domain;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class ResponseValueTest {
 
@@ -42,5 +43,15 @@ public class ResponseValueTest {
     public void testToString() throws Exception {
         final String expResult = "test-name:test-type";
         assertEquals(expResult,instance.toString());
+    }
+
+    @Test
+    public void testIsRequired() throws Exception {
+        assertTrue(instance.isRequired());
+    }
+
+    @Test
+    public void testIsAncestor() throws Exception {
+        assertFalse(instance.isAncestor(instance));
     }
 }
