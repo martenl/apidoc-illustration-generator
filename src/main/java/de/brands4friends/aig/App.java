@@ -7,12 +7,12 @@ import java.io.IOException;
 
 public class App {
 
-    static public void main(String[] args) throws IOException {
+    static public void main(String[] args) throws UnknownFileFormatException,IOException {
         App myApp = new App();
         myApp.execute(args[0],args[1],Integer.parseInt(args[2]));
     }
 
-    public void execute(String inputFileName,String outputFileName,int outerboundX) throws IOException {
+    public void execute(String inputFileName,String outputFileName,int outerboundX) throws UnknownFileFormatException,IOException {
 
         System.out.println("input from "+inputFileName);
         System.out.println("create build pipeline");
@@ -25,23 +25,18 @@ public class App {
     }
 
     private CanvasProvider createCanvasProvider(String outputFileName) {
-        if(outputFileName.endsWith("png")){
-            return new PngProvider();
-        }
-        if(outputFileName.endsWith("jpg") || outputFileName.endsWith("jpeg")){
-            return new JpegProvider();
-        }
         return new SVGProvider();
     }
 
-    private FileProcessor createFileProcessor(String inputFileName) {
-        if(inputFileName.endsWith("json")){
+    private FileProcessor createFileProcessor(String inputFileName) throws UnknownFileFormatException{
+        final String format = inputFileName.substring(inputFileName.lastIndexOf(".")+1);
+        if(format.equals("json")){
             return new JsonProcessor();
         }
-        if(inputFileName.endsWith("yaml")){
+        if(format.equals("yaml")){
             return new YamlProcessor();
         }
-        return new TextFileProcessor();
+        throw new UnknownFileFormatException(format);
 
     }
 }
