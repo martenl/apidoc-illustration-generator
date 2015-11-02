@@ -108,7 +108,7 @@ public class JacksonParser {
         arrayValues.add(parse("element",node.get("items"), true));
         String minItems = "0";
         JsonNode minItemsNode = node.get("minItems");
-        if(minItems != null){
+        if(minItemsNode != null){
             minItems = minItemsNode.asText();
         }
         String maxItems = "n";
