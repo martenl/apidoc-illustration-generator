@@ -55,4 +55,40 @@ public class ResponseReference implements ResponseElement {
     public String getReference(){
         return reference;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof ResponseReference)){
+            return false;
+        }
+
+        ResponseReference that = (ResponseReference) o;
+
+        if (required != that.required){
+            return false;
+        }
+        if (!name.equals(that.name)){
+            return false;
+        }
+        if (!reference.equals(that.reference)){
+            return false;
+        }
+        if (!type.equals(that.type)){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + reference.hashCode();
+        result = 31 * result + (required ? 1 : 0);
+        return result;
+    }
 }

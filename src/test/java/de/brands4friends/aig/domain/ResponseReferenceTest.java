@@ -48,7 +48,7 @@ public class ResponseReferenceTest {
 
     @Test
     public void testIsAncestor() throws Exception {
-
+        assertFalse(instance.isAncestor(instance));
     }
 
     @Test
