@@ -3,8 +3,6 @@ package de.brands4friends.aig.util;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
-
 import static org.junit.Assert.assertNotNull;
 
 public class SVGProviderTest {
@@ -19,7 +17,7 @@ public class SVGProviderTest {
     }
     @Test
     public void testProvideCanvas() throws Exception {
-        Graphics2D canvas = instance.provideCanvas(HEIGHT,WIDTH);
+        Canvas canvas = instance.provideCanvas(HEIGHT,WIDTH);
         assertNotNull(canvas);
     }
 

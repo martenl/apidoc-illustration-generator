@@ -11,18 +11,19 @@ import java.io.IOException;
 public class SVGProvider implements CanvasProvider {
 
     @Override
-    public Graphics2D provideCanvas(int height, int width) {
+    public Canvas provideCanvas(int height, int width) {
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         String svgNS = "http://www.w3.org/2000/svg";
         Document document = domImpl.createDocument(svgNS, "svg", null);
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-        return svgGenerator;
+        return new Canvas(svgGenerator);
     }
 
     @Override
-    public void storeCanvas(Graphics2D canvas, String fileName, int width, int height) throws IOException{
-        if(canvas instanceof SVGGraphics2D){
-            SVGGraphics2D svgCanvas = (SVGGraphics2D) canvas;
+    public void storeCanvas(Canvas canvas, String fileName, int width, int height) throws IOException{
+        Graphics2D canvasContent = canvas.getCanvasContent();
+        if(canvasContent instanceof SVGGraphics2D){
+            SVGGraphics2D svgCanvas = (SVGGraphics2D) canvasContent;
             svgCanvas.setSVGCanvasSize(new Dimension(height,width));
             svgCanvas.stream(fileName);
         }
