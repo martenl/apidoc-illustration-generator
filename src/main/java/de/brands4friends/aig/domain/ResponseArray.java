@@ -68,4 +68,44 @@ public class ResponseArray implements ResponseElement {
     public String toString(){
         return name+" : array["+min+" : "+max+"]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof ResponseArray)){
+            return false;
+        }
+
+        ResponseArray that = (ResponseArray) o;
+
+        if (required != that.required){
+            return false;
+        }
+        if (!children.equals(that.children)){
+            return false;
+        }
+        if (!max.equals(that.max)){
+            return false;
+        }
+        if (!min.equals(that.min)){
+            return false;
+        }
+        if (!name.equals(that.name)){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + children.hashCode();
+        result = 31 * result + min.hashCode();
+        result = 31 * result + max.hashCode();
+        result = 31 * result + (required ? 1 : 0);
+        return result;
+    }
 }

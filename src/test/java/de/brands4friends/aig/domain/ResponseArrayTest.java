@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -14,11 +15,13 @@ public class ResponseArrayTest {
     private final String MIN = "0";
     private final String MAX = "n";
     private final boolean required = true;
+    private List<ResponseElement> children;
     private ResponseArray instance;
 
     @Before
     public void setUp() throws Exception {
-        instance = new ResponseArray(NAME,new ArrayList<ResponseElement>(),MIN,MAX, required);
+        children = new ArrayList<ResponseElement>();
+        instance = new ResponseArray(NAME,children,MIN,MAX, required);
     }
 
     @Test
@@ -41,7 +44,7 @@ public class ResponseArrayTest {
     @Test
     public void testGetType() throws Exception {
         final String expResult = "array";
-        assertEquals(expResult,instance.getType());
+        assertEquals(expResult, instance.getType());
     }
 
     @Test
@@ -71,5 +74,35 @@ public class ResponseArrayTest {
     public void testIsRequiredWithFalse() throws Exception {
         instance = new ResponseArray(NAME,new ArrayList<ResponseElement>(),MIN,MAX, false);
         assertFalse(instance.isRequired());
+    }
+
+    @Test
+    public void testIsAncestor() throws Exception {
+        final ResponseElement notAChild = new ResponseValue("notAChild","string",false);
+        assertFalse(instance.isAncestor(notAChild));
+    }
+
+    @Test
+    public void testIsAncestorWithDirectChild() throws Exception {
+        final ResponseElement child = new ResponseValue("child","string",false);
+        children.add(child);
+        assertTrue(instance.isAncestor(child));
+    }
+
+    @Test
+    public void testIsAncestorWithIndirectChild() throws Exception {
+        final ResponseElement indirectChild = new ResponseValue("indirectChild","string",false);
+        final ResponseElement childNode = new ResponseNode("childNode","node", Arrays.asList(indirectChild),true);
+        children.add(childNode);
+        assertTrue(instance.isAncestor(indirectChild));
+    }
+
+    @Test
+    public void testIsAncestorWithIndirectNotAChild() throws Exception {
+        final ResponseElement indirectNotAChild = new ResponseValue("indirectNotAChild","string",false);
+        final ResponseElement indirectChild = new ResponseValue("indirectChild","string",false);
+        final ResponseElement childNode = new ResponseNode("childNode","node",Arrays.asList(indirectChild),true);
+        children.add(childNode);
+        assertFalse(instance.isAncestor(indirectNotAChild));
     }
 }
