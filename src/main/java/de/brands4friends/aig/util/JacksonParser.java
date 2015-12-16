@@ -29,6 +29,9 @@ public class JacksonParser {
 
     private Map<String,ResponseElement> parseDefinitions(JsonNode definitions){
         final Map<String,ResponseElement> definitionMap = new HashMap<String, ResponseElement>();
+        if(definitions == null){
+            return definitionMap;
+        }
         Iterator<String> fieldNames = definitions.fieldNames();
         while(fieldNames.hasNext()) {
             final String definition = fieldNames.next();
@@ -105,7 +108,13 @@ public class JacksonParser {
 
     private ResponseElement parseArray(String nodeName, JsonNode node, boolean required) {
         final List<ResponseElement> arrayValues = new ArrayList<ResponseElement>();
-        arrayValues.add(parse("element",node.get("items"), true));
+        final String elementName;
+        if(node.hasNonNull("id")){
+            elementName = node.get("id").asText();
+        }else{
+            elementName = "element";
+        }
+        arrayValues.add(parse(elementName,node.get("items"), true));
         String minItems = "0";
         JsonNode minItemsNode = node.get("minItems");
         if(minItemsNode != null){
