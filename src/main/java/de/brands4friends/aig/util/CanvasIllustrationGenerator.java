@@ -21,6 +21,7 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
     private ResponseElementExtentProvider extentProvider;
     private DefaultConfiguration<ResponseElement> configuration;
 
+
     public CanvasIllustrationGenerator(CanvasProvider canvasProvider) {
         this.canvasProvider = canvasProvider;
     }
@@ -35,17 +36,17 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
                 gapBetweenLevels, gapBetweenNodes, Configuration.Location.Left, Configuration.AlignmentInLevel.TowardsRoot);
         int offsetX = 20;
         int offsetY = 70;
-        for(String elementName : responseDescription.getTypes().keySet()){
-            TreeLayout<ResponseElement> treeLayout = createLayout(responseDescription.getTypes().get(elementName));
+        for(ResponseElement type : responseDescription.getSortedDependencies()){
+            TreeLayout<ResponseElement> treeLayout = createLayout(type);
             offsetY = drawLayout(treeLayout, canvas, offsetX, offsetY,outerboundX);
         }
         canvasProvider.storeCanvas(canvas,outputFileName,offsetY,outerboundX);
     }
 
-    private TreeLayout<ResponseElement> createLayout(ResponseElement element){
+     private TreeLayout<ResponseElement> createLayout(ResponseElement element){
         DefaultTreeForTreeLayout<ResponseElement> tree = new DefaultTreeForTreeLayout<ResponseElement>(element);
         for(ResponseElement child : element.getChildren()){
-            addElement(child,element,tree);
+            addElement(child, element, tree);
         }
         return new TreeLayout<ResponseElement>(tree,extentProvider,configuration);
     }
