@@ -76,6 +76,18 @@ public class JacksonParser {
                 requiredFields.add(iterator.next().asText());
             }
         }
+        if(properties != null){
+            children.addAll(parseProperties(properties,requiredFields));
+        }
+        final JsonNode patternProperties = node.get("patternProperties");
+        if(patternProperties != null){
+            children.addAll(parsePatternProperties(patternProperties));
+        }
+        return new ResponseNode(objectName,"object",children,required);
+    }
+
+    private List<ResponseElement> parseProperties(JsonNode properties,List<String> requiredFields){
+        List<ResponseElement> children = new ArrayList<ResponseElement>();
         final Iterator<String> fieldNames = properties.fieldNames();
         while(fieldNames.hasNext()) {
             final String propertyName = fieldNames.next();
@@ -83,7 +95,18 @@ public class JacksonParser {
             JsonNode property = properties.get(propertyName);
             children.add(parse(propertyName,property,isRequiredField));
         }
-        return new ResponseNode(objectName,"object",children,required);
+        return children;
+    }
+
+    private List<ResponseElement> parsePatternProperties(JsonNode patternProperties){
+        List<ResponseElement> children = new ArrayList<ResponseElement>();
+        final Iterator<String> patterns = patternProperties.fieldNames();
+        while(patterns.hasNext()){
+            final String pattern = patterns.next();
+            JsonNode property = patternProperties.get(pattern);
+            children.add(parse("Pattern: "+pattern,property,true));
+        }
+        return children;
     }
 
     private boolean isEnum(JsonNode node){
@@ -115,8 +138,8 @@ public class JacksonParser {
             elementName = "element";
         }
         arrayValues.add(parse(elementName,node.get("items"), true));
-        String minItems = "0";
         JsonNode minItemsNode = node.get("minItems");
+        String minItems = "0";
         if(minItemsNode != null){
             minItems = minItemsNode.asText();
         }
