@@ -1,7 +1,7 @@
 package de.brands4friends.aig.util;
 
-import de.brands4friends.aig.domain.ResponseDescription;
 import de.brands4friends.aig.domain.ResponseElement;
+import de.brands4friends.aig.domain.Schema;
 import org.abego.treelayout.Configuration;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
@@ -27,7 +27,7 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
     }
 
     @Override
-    public void createIllustration(ResponseDescription responseDescription, String outputFileName, int outerboundX) throws IOException {
+    public void createIllustration(Schema schema, String outputFileName, int outerboundX) throws IOException {
         Canvas canvas = canvasProvider.provideCanvas(1000,1000);
         extentProvider = new ResponseElementExtentProvider(25,canvas.getCanvasContent().getFontMetrics());
         double gapBetweenLevels = 20;
@@ -36,7 +36,7 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
                 gapBetweenLevels, gapBetweenNodes, Configuration.Location.Left, Configuration.AlignmentInLevel.TowardsRoot);
         int offsetX = 20;
         int offsetY = 70;
-        for(ResponseElement type : responseDescription.getSortedDependencies()){
+        for(ResponseElement type : schema.getSortedDependencies()){
             TreeLayout<ResponseElement> treeLayout = createLayout(type);
             offsetY = drawLayout(treeLayout, canvas, offsetX, offsetY,outerboundX);
         }

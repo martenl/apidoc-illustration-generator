@@ -2,12 +2,12 @@ package de.brands4friends.aig.domain;
 
 import java.util.*;
 
-public class ResponseDescription {
+public class Schema {
 
     private final Map<String,ResponseElement> definedTypes;
     private final List<String> sortedDependencies;
 
-    public ResponseDescription(Map<String, ResponseElement> definedTypes, List<String> sortedDependencies) {
+    public Schema(Map<String, ResponseElement> definedTypes, List<String> sortedDependencies) {
         this.definedTypes = definedTypes;
         this.sortedDependencies = sortedDependencies;
     }
@@ -67,8 +67,8 @@ public class ResponseDescription {
             }
             return sortedDependencies;
         }
-        public ResponseDescription build(){
-            return new ResponseDescription(definedTypes,computeDependencies());
+        public Schema build(){
+            return new Schema(definedTypes,computeDependencies());
         }
     }
 

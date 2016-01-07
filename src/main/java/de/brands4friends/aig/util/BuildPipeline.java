@@ -1,6 +1,6 @@
 package de.brands4friends.aig.util;
 
-import de.brands4friends.aig.domain.ResponseDescription;
+import de.brands4friends.aig.domain.Schema;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ public class BuildPipeline {
 
     public void execute(String inputFileName, String outputFileName, int outerboundX) throws IOException {
         System.out.println("reading file");
-        ResponseDescription responseDescription = fileProcessor.readFromFile(inputFileName);
-        illustrationGenerator.createIllustration(responseDescription,outputFileName,outerboundX);
+        Schema schema = fileProcessor.readFromFile(inputFileName);
+        illustrationGenerator.createIllustration(schema,outputFileName,outerboundX);
     }
 }
