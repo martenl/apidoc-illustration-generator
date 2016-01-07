@@ -8,19 +8,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class YamlProcessor implements FileProcessor {
+public class SchemaParser implements FileProcessor {
 
     private String directory;
     private final JacksonParser parser;
 
-    public YamlProcessor() {
-        parser = new JacksonParser(new ObjectMapper(new YAMLFactory()));
+    public SchemaParser(JacksonParser parser) {
+        this.parser = parser;
     }
 
     @Override
-    public ResponseDescription readFromFile(String fileName) throws IOException {
+    public Schema readFromFile(String fileName) throws IOException {
         directory = fileName.substring(0,fileName.lastIndexOf(File.separator));
-        ResponseDescription.Builder builder = ResponseDescription.builder();
+        Schema.Builder builder = Schema.builder();
         Map<String,ResponseElement> definitionMap = parser.parseFile(fileName);
         Map<String,ResponseElement> externalDefinitions = loadExternalDefinitions(computeExternalReferences(definitionMap.values()));
         definitionMap.putAll(externalDefinitions);
@@ -107,5 +107,13 @@ public class YamlProcessor implements FileProcessor {
             }
         }
         return fileNameToTypes;
+    }
+
+    public static FileProcessor yamlParser(){
+        return new SchemaParser(new JacksonParser(new ObjectMapper(new YAMLFactory())));
+    }
+
+    public static FileProcessor jsonParser(){
+        return new SchemaParser(new JacksonParser(new ObjectMapper()));
     }
 }

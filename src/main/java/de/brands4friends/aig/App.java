@@ -30,11 +30,11 @@ public class App {
 
     private FileProcessor createFileProcessor(String inputFileName) throws UnknownFileFormatException{
         final String format = inputFileName.substring(inputFileName.lastIndexOf(".")+1);
-        if(format.equals("json")){
-            return new JsonProcessor();
+        if("json".equals(format)){
+            return SchemaParser.jsonParser();
         }
-        if(format.equals("yaml")){
-            return new YamlProcessor();
+        if("yaml".equals(format)){
+            return SchemaParser.yamlParser();
         }
         throw new UnknownFileFormatException(format);
 
