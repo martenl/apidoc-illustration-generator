@@ -44,6 +44,9 @@ public class Schema {
 
         private List<String> computeDependencies(){
             List<String> sortedDependencies = new ArrayList<String>();
+            if(definedTypes.isEmpty()){
+                return sortedDependencies;
+            }
             sortedDependencies.add("Response");
             ResponseElement element = definedTypes.get("Response");
             List<ResponseElement> children = new ArrayList<ResponseElement>(element.getChildren());
