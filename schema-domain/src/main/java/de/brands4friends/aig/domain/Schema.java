@@ -55,7 +55,7 @@ public class Schema {
             while(!children.isEmpty()){
                 ResponseElement child = children.remove(0);
                 if(child instanceof ResponseReference){
-                    String type = ((ResponseReference) child).getType();
+                    String type = child.getType();
                     if(!sortedDependencies.contains(type)){
                         sortedDependencies.add(type);
                         children.add(definedTypes.get(type));
