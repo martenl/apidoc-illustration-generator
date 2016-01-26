@@ -33,7 +33,10 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         double gapBetweenLevels = 20;
         double gapBetweenNodes = 10;
         configuration = new DefaultConfiguration<ResponseElement>(
-                gapBetweenLevels, gapBetweenNodes, Configuration.Location.Left, Configuration.AlignmentInLevel.TowardsRoot);
+                gapBetweenLevels,
+                gapBetweenNodes,
+                Configuration.Location.Left,
+                Configuration.AlignmentInLevel.TowardsRoot);
         int offsetX = 20;
         int offsetY = 70;
         for(ResponseElement type : schema.getSortedDependencies()){
@@ -51,8 +54,20 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         return new TreeLayout<ResponseElement>(tree,extentProvider,configuration);
     }
 
+    private void addElement(ResponseElement element,ResponseElement root,DefaultTreeForTreeLayout<ResponseElement> tree){
+        tree.addChild(root, element);
+        if(element.isNode()){
+            for(ResponseElement child : element.getChildren()){
+                addElement(child, element, tree);
+            }
+        }
+    }
+
     private int drawLayout(TreeLayout<ResponseElement> treeLayout, Canvas canvas, int offsetX, int offsetY,int outerboundX){
-        List<ResponseElement> outOfBounds = getOutOfBoundsElements(treeLayout.getTree().getRoot(),treeLayout,outerboundX-offsetX);
+        List<ResponseElement> outOfBounds = getOutOfBoundsElements(
+                treeLayout.getTree().getRoot(),
+                treeLayout,
+                outerboundX-offsetX);
         drawVertices(treeLayout, outOfBounds, canvas, offsetX, offsetY);
         drawEdges(treeLayout, outOfBounds, canvas, offsetX, offsetY);
         offsetY = offsetY + (int)treeLayout.getBounds().getHeight() + 20;
@@ -63,16 +78,12 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         return offsetY;
     }
 
-    private void addElement(ResponseElement element,ResponseElement root,DefaultTreeForTreeLayout<ResponseElement> tree){
-        tree.addChild(root, element);
-        if(element.isNode()){
-            for(ResponseElement child : element.getChildren()){
-                addElement(child, element, tree);
-            }
-        }
-    }
-
-    private void drawVertices(TreeLayout<ResponseElement> treeLayout,List<ResponseElement> outOfBounds, Canvas canvas, int offsetX, int offsetY) {
+    private void drawVertices(
+            TreeLayout<ResponseElement> treeLayout,
+            List<ResponseElement> outOfBounds,
+            Canvas canvas,
+            int offsetX,
+            int offsetY) {
         for (ResponseElement element : treeLayout.getNodeBounds().keySet()) {
             if(isAncestorOfAny(element, outOfBounds)){
                 continue;
@@ -82,7 +93,12 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         }
     }
 
-    private void drawEdges(TreeLayout<ResponseElement> treeLayout, List<ResponseElement> outOfBounds, Canvas canvas, int offsetX, int offsetY){
+    private void drawEdges(
+            TreeLayout<ResponseElement> treeLayout,
+            List<ResponseElement> outOfBounds,
+            Canvas canvas,
+            int offsetX,
+            int offsetY){
         TreeForTreeLayout<ResponseElement> tree = treeLayout.getTree();
         for(ResponseElement element : treeLayout.getNodeBounds().keySet()){
             if(tree.isLeaf(element) || outOfBounds.contains(element) || isAncestorOfAny(element,outOfBounds)){
@@ -96,7 +112,10 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         return new Rectangle2D.Double(box.getX()+offsetX,box.getY()+offsetY,box.getWidth(),box.getHeight());
     }
 
-    private List<ResponseElement> getOutOfBoundsElements(ResponseElement root,TreeLayout<ResponseElement> layout,int outerXBound){
+    private List<ResponseElement> getOutOfBoundsElements(
+            ResponseElement root,
+            TreeLayout<ResponseElement> layout,
+            int outerXBound){
         final List<ResponseElement> outOfBoundsElements = new ArrayList<ResponseElement>();
         Queue<ResponseElement> elementQueue = new LinkedList<ResponseElement>();
         elementQueue.offer(root);
