@@ -18,8 +18,8 @@ import java.util.Queue;
 public class CanvasIllustrationGenerator implements IllustrationGenerator {
 
     private final CanvasProvider canvasProvider;
-    private ResponseElementExtentProvider extentProvider;
-    private DefaultConfiguration<ResponseElement> configuration;
+    private TreeNodeExtentProvider extentProvider;
+    private DefaultConfiguration<TreeNode> configuration;
 
 
     public CanvasIllustrationGenerator(CanvasProvider canvasProvider) {
@@ -29,10 +29,10 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
     @Override
     public void createIllustration(Schema schema, String outputFileName, int outerboundX) throws IOException {
         Canvas canvas = canvasProvider.provideCanvas(1000,1000);
-        extentProvider = new ResponseElementExtentProvider(25,canvas.getCanvasContent().getFontMetrics());
+        extentProvider = new TreeNodeExtentProvider(25,canvas.getCanvasContent().getFontMetrics());
         double gapBetweenLevels = 20;
         double gapBetweenNodes = 10;
-        configuration = new DefaultConfiguration<ResponseElement>(
+        configuration = new DefaultConfiguration<TreeNode>(
                 gapBetweenLevels,
                 gapBetweenNodes,
                 Configuration.Location.Left,
@@ -40,87 +40,55 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         int offsetX = 20;
         int offsetY = 70;
         for(ResponseElement type : schema.getSortedDependencies()){
-            TreeLayout<ResponseElement> treeLayout = createLayout(type);
+            TreeLayout<TreeNode> treeLayout = createLayout(type);
             offsetY = drawLayout(treeLayout, canvas, offsetX, offsetY,outerboundX);
         }
         canvasProvider.storeCanvas(canvas,outputFileName,offsetY,outerboundX);
     }
 
-     private TreeLayout<ResponseElement> createLayout(ResponseElement element){
-        DefaultTreeForTreeLayout<ResponseElement> tree = new DefaultTreeForTreeLayout<ResponseElement>(element);
-        for(ResponseElement child : element.getChildren()){
-            addElement(child, element, tree);
-        }
-        return new TreeLayout<ResponseElement>(tree,extentProvider,configuration);
+     private TreeLayout<TreeNode> createLayout(ResponseElement element){
+         TreeNode root = new TreeNode(element);
+         DefaultTreeForTreeLayout<TreeNode> tree = new DefaultTreeForTreeLayout<TreeNode>(root);
+         for(TreeNode child : root.getChildren()){
+             addElement(child,root,tree);
+         }
+         return new TreeLayout<TreeNode>(tree,extentProvider,configuration);
     }
 
-    private void addElement(ResponseElement element,ResponseElement root,DefaultTreeForTreeLayout<ResponseElement> tree){
+    private void addElement(TreeNode element,TreeNode root,DefaultTreeForTreeLayout<TreeNode> tree){
         tree.addChild(root, element);
-        if(element.isNode()){
-            for(ResponseElement child : element.getChildren()){
+        if(element.getElement().isNode()){
+            for(TreeNode child : element.getChildren()){
                 addElement(child, element, tree);
             }
         }
     }
 
-    private int drawLayout(TreeLayout<ResponseElement> treeLayout, Canvas canvas, int offsetX, int offsetY,int outerboundX){
-        List<ResponseElement> outOfBounds = getOutOfBoundsElements(
+    private int drawLayout(TreeLayout<TreeNode> treeLayout, Canvas canvas, int offsetX, int offsetY,int outerboundX){
+        List<TreeNode> outOfBounds = getOutOfBoundsElements(
                 treeLayout.getTree().getRoot(),
                 treeLayout,
-                outerboundX-offsetX);
+                outerboundX - offsetX);
         drawVertices(treeLayout, outOfBounds, canvas, offsetX, offsetY);
         drawEdges(treeLayout, outOfBounds, canvas, offsetX, offsetY);
         offsetY = offsetY + (int)treeLayout.getBounds().getHeight() + 20;
-        for(ResponseElement outOfBoundElement : outOfBounds){
-            TreeLayout<ResponseElement> outOfBoundsElementLayout = createLayout(outOfBoundElement);
+        for(TreeNode outOfBoundElement : outOfBounds){
+            TreeLayout<TreeNode> outOfBoundsElementLayout = createLayout(outOfBoundElement.getElement());
             offsetY = drawLayout(outOfBoundsElementLayout,canvas,offsetX,offsetY,outerboundX);
         }
         return offsetY;
     }
 
-    private void drawVertices(
-            TreeLayout<ResponseElement> treeLayout,
-            List<ResponseElement> outOfBounds,
-            Canvas canvas,
-            int offsetX,
-            int offsetY) {
-        for (ResponseElement element : treeLayout.getNodeBounds().keySet()) {
-            if(isAncestorOfAny(element, outOfBounds)){
-                continue;
-            }
-            Rectangle2D.Double box = addOffset(treeLayout.getNodeBounds().get(element),offsetX,offsetY);
-            canvas.drawVertex(element,box);
-        }
-    }
-
-    private void drawEdges(
-            TreeLayout<ResponseElement> treeLayout,
-            List<ResponseElement> outOfBounds,
-            Canvas canvas,
-            int offsetX,
-            int offsetY){
-        TreeForTreeLayout<ResponseElement> tree = treeLayout.getTree();
-        for(ResponseElement element : treeLayout.getNodeBounds().keySet()){
-            if(tree.isLeaf(element) || outOfBounds.contains(element) || isAncestorOfAny(element,outOfBounds)){
-                continue;
-            }
-            canvas.drawEdgesToChildren(treeLayout,element,offsetX,offsetY);
-        }
-    }
-
-    private Rectangle2D.Double addOffset(Rectangle2D box,int offsetX, int offsetY){
-        return new Rectangle2D.Double(box.getX()+offsetX,box.getY()+offsetY,box.getWidth(),box.getHeight());
-    }
-
-    private List<ResponseElement> getOutOfBoundsElements(
-            ResponseElement root,
-            TreeLayout<ResponseElement> layout,
+    private List<TreeNode> getOutOfBoundsElements(
+            TreeNode root,
+            TreeLayout<TreeNode> layout,
             int outerXBound){
-        final List<ResponseElement> outOfBoundsElements = new ArrayList<ResponseElement>();
-        Queue<ResponseElement> elementQueue = new LinkedList<ResponseElement>();
+        final List<TreeNode> outOfBoundsElements = new ArrayList<TreeNode>();
+        Queue<TreeNode> elementQueue = new LinkedList<TreeNode>();
         elementQueue.offer(root);
+        //layout.getTree().
         while (!elementQueue.isEmpty()){
-            final ResponseElement element = elementQueue.poll();
+            final TreeNode element = elementQueue.poll();
             if(allInsideBounds(element.getChildren(),layout,outerXBound)){
                 elementQueue.addAll(element.getChildren());
             }else{
@@ -130,22 +98,57 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
         return outOfBoundsElements;
     }
 
-    private boolean allInsideBounds(List<ResponseElement> elements,TreeLayout<ResponseElement> layout,int outerXBound){
-        for(ResponseElement element : elements){
+    private boolean allInsideBounds(List<TreeNode> elements,TreeLayout<TreeNode> layout,int outerXBound){
+        for(TreeNode element : elements){
             Rectangle2D.Double bound = layout.getNodeBounds().get(element);
-            if(bound.getX()+bound.getWidth() >  outerXBound){
+            if(bound.getX()+ bound.getWidth() >  outerXBound){
                 return false;
             }
         }
         return true;
     }
 
-    private boolean isAncestorOfAny(ResponseElement element,List<ResponseElement> ancestors){
-        for(ResponseElement ancestor : ancestors){
-            if(ancestor.isAncestor(element)){
+    private void drawVertices(
+            TreeLayout<TreeNode> treeLayout,
+            List<TreeNode> outOfBounds,
+            Canvas canvas,
+            int offsetX,
+            int offsetY) {
+        for (TreeNode element : treeLayout.getNodeBounds().keySet()) {
+            if(isAncestorOfAny(element, outOfBounds)){
+                continue;
+            }
+            Rectangle2D.Double box = addOffset(treeLayout.getNodeBounds().get(element),offsetX,offsetY);
+            canvas.drawVertex(element.getElement(), box);
+        }
+    }
+
+    private void drawEdges(
+            TreeLayout<TreeNode> treeLayout,
+            List<TreeNode> outOfBounds,
+            Canvas canvas,
+            int offsetX,
+            int offsetY){
+        TreeForTreeLayout<TreeNode> tree = treeLayout.getTree();
+        for(TreeNode element : treeLayout.getNodeBounds().keySet()){
+            if(tree.isLeaf(element) || outOfBounds.contains(element) || isAncestorOfAny(element,outOfBounds)){
+                continue;
+            }
+            canvas.drawEdgesToChildren(treeLayout,element,offsetX,offsetY);
+        }
+    }
+
+    private boolean isAncestorOfAny(TreeNode element,List<TreeNode> ancestors){
+        ResponseElement elementPayload = element.getElement();
+        for(TreeNode ancestor : ancestors){
+            if(ancestor.getElement().isAncestor(elementPayload)){
                 return true;
             }
         }
         return false;
+    }
+
+    private Rectangle2D.Double addOffset(Rectangle2D box,int offsetX, int offsetY){
+        return new Rectangle2D.Double(box.getX()+offsetX,box.getY()+offsetY,box.getWidth(),box.getHeight());
     }
 }

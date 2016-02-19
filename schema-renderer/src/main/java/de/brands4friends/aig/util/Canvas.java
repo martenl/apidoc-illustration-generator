@@ -109,20 +109,20 @@ public class Canvas {
         }
     }
 
-    public void drawEdgesToChildren(TreeLayout<ResponseElement> treeLayout, ResponseElement element,int offsetX,int offsetY){
+    public void drawEdgesToChildren(TreeLayout<TreeNode> treeLayout, TreeNode element,int offsetX,int offsetY){
         canvasContent.setColor(EDGE_COLOR);
         Rectangle2D.Double parentBounds = addOffset(treeLayout.getNodeBounds().get(element), offsetX, offsetY);
         int parentX = (int) (parentBounds.getX()+parentBounds.getWidth());
         int parentY = (int) (parentBounds.getY() + parentBounds.getHeight()/2);
-        java.util.List<ResponseElement> children = element.getChildren();
-        ResponseElement firstChild = children.get(0);
+        java.util.List<TreeNode> children = element.getChildren();
+        TreeNode firstChild = children.get(0);
         Rectangle2D.Double minBounds = addOffset(treeLayout.getNodeBounds().get(firstChild), offsetX, offsetY);
         final int minY = (int) (minBounds.getY() + minBounds.getHeight()/2);
         int middleX = (int) (minBounds.getX()*.8 + parentX*.2);
-        ResponseElement lastChild = children.get(children.size() - 1);
+        TreeNode lastChild = children.get(children.size() - 1);
         Rectangle2D.Double maxBounds = addOffset(treeLayout.getNodeBounds().get(lastChild), offsetX, offsetY);
         final int maxY = (int) (maxBounds.getY() + maxBounds.getHeight()/2);
-        for(ResponseElement child : children){
+        for(TreeNode child : children){
             Rectangle2D.Double bounds = addOffset(treeLayout.getNodeBounds().get(child), offsetX, offsetY);
             int x = (int) bounds.getX();
             int y = (int) (bounds.getY() + bounds.getHeight()/2);
