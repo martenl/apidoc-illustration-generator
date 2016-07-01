@@ -16,32 +16,32 @@ public class JacksonParser {
         this.mapper = mapper;
     }
 
-    public Map<String,ResponseElement> parseFile(final String fileName) throws IOException {
+    public Map<String,SchemaElement> parseFile(final String fileName) throws IOException {
         final JsonNode rootNode = mapper.readTree(new File(fileName));
         final JsonNode definitions = rootNode.get("definitions");
-        final Map<String,ResponseElement> parsedResponseElements = parseDefinitions(definitions);
+        final Map<String,SchemaElement> parsedResponseElements = parseDefinitions(definitions);
         if(isObject(rootNode)){
-            ResponseElement response = parse("Response", rootNode, true);
+            SchemaElement response = parse("Response", rootNode, true);
             parsedResponseElements.put("Response",response);
         }
         return parsedResponseElements;
     }
 
-    private Map<String,ResponseElement> parseDefinitions(JsonNode definitions){
-        final Map<String,ResponseElement> definitionMap = new HashMap<String, ResponseElement>();
+    private Map<String,SchemaElement> parseDefinitions(JsonNode definitions){
+        final Map<String,SchemaElement> definitionMap = new HashMap<String, SchemaElement>();
         if(definitions == null){
             return definitionMap;
         }
         Iterator<String> fieldNames = definitions.fieldNames();
         while(fieldNames.hasNext()) {
             final String definition = fieldNames.next();
-            final ResponseElement response = parse(definition, definitions.get(definition),true);
+            final SchemaElement response = parse(definition, definitions.get(definition),true);
             definitionMap.put(definition, response);
         }
         return definitionMap;
     }
 
-    private ResponseElement parse(String nodeName, JsonNode node, boolean required){
+    private SchemaElement parse(String nodeName, JsonNode node, boolean required){
         if(isObject(node)){
             return parseObject(nodeName,node,required);
         }
@@ -65,8 +65,8 @@ public class JacksonParser {
         return false;
     }
 
-    private ResponseElement parseObject(String objectName,JsonNode node,boolean required){
-        final List<ResponseElement> children = new ArrayList<ResponseElement>();
+    private SchemaElement parseObject(String objectName,JsonNode node,boolean required){
+        final List<SchemaElement> children = new ArrayList<SchemaElement>();
         final JsonNode properties = node.get("properties");
         final List<String> requiredFields = new ArrayList<String>();
         JsonNode requiredFieldsNode = node.get("required");
@@ -83,11 +83,11 @@ public class JacksonParser {
         if(patternProperties != null){
             children.addAll(parsePatternProperties(patternProperties));
         }
-        return new ResponseNode(objectName,"object",children,required);
+        return new SchemaNode(objectName,"object",children,required);
     }
 
-    private List<ResponseElement> parseProperties(JsonNode properties,List<String> requiredFields){
-        List<ResponseElement> children = new ArrayList<ResponseElement>();
+    private List<SchemaElement> parseProperties(JsonNode properties,List<String> requiredFields){
+        List<SchemaElement> children = new ArrayList<SchemaElement>();
         final Iterator<String> fieldNames = properties.fieldNames();
         while(fieldNames.hasNext()) {
             final String propertyName = fieldNames.next();
@@ -98,8 +98,8 @@ public class JacksonParser {
         return children;
     }
 
-    private List<ResponseElement> parsePatternProperties(JsonNode patternProperties){
-        List<ResponseElement> children = new ArrayList<ResponseElement>();
+    private List<SchemaElement> parsePatternProperties(JsonNode patternProperties){
+        List<SchemaElement> children = new ArrayList<SchemaElement>();
         final Iterator<String> patterns = patternProperties.fieldNames();
         while(patterns.hasNext()){
             final String pattern = patterns.next();
@@ -113,7 +113,7 @@ public class JacksonParser {
         return node.get("enum") != null;
     }
 
-    private ResponseElement parseEnum(String nodeName, JsonNode node, boolean required) {
+    private SchemaElement parseEnum(String nodeName, JsonNode node, boolean required) {
         JsonNode values = node.get("enum");
         List<String> enumValues = new ArrayList<String>();
         Iterator<JsonNode> elements = values.elements();
@@ -121,7 +121,7 @@ public class JacksonParser {
             final String element = elements.next().asText();
             enumValues.add(element);
         }
-        return new ResponseEnum(nodeName,enumValues);
+        return new SchemaEnum(nodeName,enumValues);
     }
 
     private boolean isArray(JsonNode node){
@@ -129,8 +129,8 @@ public class JacksonParser {
         return type != null && type.asText().equals("array");
     }
 
-    private ResponseElement parseArray(String nodeName, JsonNode node, boolean required) {
-        final List<ResponseElement> arrayValues = new ArrayList<ResponseElement>();
+    private SchemaElement parseArray(String nodeName, JsonNode node, boolean required) {
+        final List<SchemaElement> arrayValues = new ArrayList<SchemaElement>();
         final String elementName;
         if(node.hasNonNull("id")){
             elementName = node.get("id").asText();
@@ -148,7 +148,7 @@ public class JacksonParser {
         if(maxItemsNode != null){
             maxItems = maxItemsNode.asText();
         }
-        return new ResponseArray(nodeName,arrayValues,minItems,maxItems,required);
+        return new SchemaArray(nodeName,arrayValues,minItems,maxItems,required);
     }
 
     private boolean isDefined(JsonNode node){
@@ -159,17 +159,17 @@ public class JacksonParser {
         return false;
     }
 
-    private ResponseElement parseDefined(String name, JsonNode node, boolean required){
+    private SchemaElement parseDefined(String name, JsonNode node, boolean required){
         String reference = node.get("$ref").asText();
         String propertyType = reference.replace("#/definitions/","");
-        return new ResponseReference(name,propertyType, reference, required);
+        return new SchemaReference(name,propertyType, reference, required);
     }
 
-    private ResponseElement parseValue(String valueName,JsonNode node,boolean required){
+    private SchemaElement parseValue(String valueName,JsonNode node,boolean required){
         JsonNode type = node.get("type");
         if(type != null){
-            return new ResponseValue(valueName,type.asText(),required);
+            return new SchemaValue(valueName,type.asText(),required);
         }
-        return new ResponseValue(valueName,"unknownType",required);
+        return new SchemaValue(valueName,"unknownType",required);
     }
 }

@@ -1,24 +1,24 @@
 package de.brands4friends.aig.util;
 
-import de.brands4friends.aig.domain.ResponseElement;
+import de.brands4friends.aig.domain.SchemaElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNode {
 
-    private final ResponseElement element;
+    private final SchemaElement element;
     private final List<TreeNode> children;
 
-    public TreeNode(ResponseElement element) {
+    public TreeNode(SchemaElement element) {
         this.element = element;
         children = new ArrayList<TreeNode>();
-        for(ResponseElement child : element.getChildren()){
+        for(SchemaElement child : element.getChildren()){
             children.add(new TreeNode(child));
         }
     }
 
-    public ResponseElement getElement() {
+    public SchemaElement getElement() {
         return element;
     }
 

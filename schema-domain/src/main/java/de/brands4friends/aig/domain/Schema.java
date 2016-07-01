@@ -4,27 +4,27 @@ import java.util.*;
 
 public class Schema {
 
-    private final Map<String,ResponseElement> definedTypes;
+    private final Map<String,SchemaElement> definedTypes;
     private final List<String> sortedDependencies;
 
-    public Schema(Map<String, ResponseElement> definedTypes, List<String> sortedDependencies) {
+    public Schema(Map<String, SchemaElement> definedTypes, List<String> sortedDependencies) {
         this.definedTypes = definedTypes;
         this.sortedDependencies = sortedDependencies;
     }
 
-    public ResponseElement getRoot(){
+    public SchemaElement getRoot(){
         return definedTypes.get("Response");
     }
 
-    public List<ResponseElement> getSortedDependencies(){
-        final List<ResponseElement> dependencies = new ArrayList<ResponseElement>();
+    public List<SchemaElement> getSortedDependencies(){
+        final List<SchemaElement> dependencies = new ArrayList<SchemaElement>();
         for(String dependency : sortedDependencies){
             dependencies.add(definedTypes.get(dependency));
         }
         return dependencies;
     }
 
-    public Map<String, ResponseElement> getTypes() {
+    public Map<String, SchemaElement> getTypes() {
         return definedTypes;
     }
 
@@ -34,10 +34,10 @@ public class Schema {
 
     public static class Builder{
         private final Map<String,Map<String,String>> data = new HashMap<String, Map<String, String>>();
-        private final Map<String,ResponseElement> definedTypes = new HashMap<String, ResponseElement>();
+        private final Map<String,SchemaElement> definedTypes = new HashMap<String, SchemaElement>();
 
 
-        public Builder addTypeMap(Map<String,ResponseElement> types){
+        public Builder addTypeMap(Map<String,SchemaElement> types){
             definedTypes.putAll(types);
             return this;
         }
@@ -48,13 +48,13 @@ public class Schema {
                 return sortedDependencies;
             }
             sortedDependencies.add("Response");
-            ResponseElement element = definedTypes.get("Response");
-            List<ResponseElement> children = new ArrayList<ResponseElement>(element.getChildren());
-            Set<ResponseElement> alreadySeenChildren = new HashSet<ResponseElement>();
+            SchemaElement element = definedTypes.get("Response");
+            List<SchemaElement> children = new ArrayList<SchemaElement>(element.getChildren());
+            Set<SchemaElement> alreadySeenChildren = new HashSet<SchemaElement>();
             alreadySeenChildren.add(element);
             while(!children.isEmpty()){
-                ResponseElement child = children.remove(0);
-                if(child instanceof ResponseReference){
+                SchemaElement child = children.remove(0);
+                if(child instanceof SchemaReference){
                     String type = child.getType();
                     if(!sortedDependencies.contains(type)){
                         sortedDependencies.add(type);
@@ -62,7 +62,7 @@ public class Schema {
                     }
                 }
                 alreadySeenChildren.add(child);
-                for(ResponseElement grandChild : child.getChildren()){
+                for(SchemaElement grandChild : child.getChildren()){
                     if(!alreadySeenChildren.contains(grandChild)){
                         children.add(grandChild);
                     }

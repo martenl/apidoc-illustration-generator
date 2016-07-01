@@ -21,64 +21,64 @@ public class SchemaParser implements FileProcessor {
     public Schema readFromFile(String fileName) throws IOException {
         directory = fileName.substring(0,fileName.lastIndexOf(File.separator));
         Schema.Builder builder = Schema.builder();
-        Map<String,ResponseElement> definitionMap = parser.parseFile(fileName);
-        Map<String,ResponseElement> externalDefinitions = loadExternalDefinitions(computeExternalReferences(definitionMap.values()));
+        Map<String,SchemaElement> definitionMap = parser.parseFile(fileName);
+        Map<String,SchemaElement> externalDefinitions = loadExternalDefinitions(computeExternalReferences(definitionMap.values()));
         definitionMap.putAll(externalDefinitions);
         builder.addTypeMap(definitionMap);
         return builder.build();
     }
 
-    private List<String> computeExternalReferences(Collection<ResponseElement> responseElements){
+    private List<String> computeExternalReferences(Collection<SchemaElement> schemaElements){
         List<String> externalReferences = new ArrayList<String>();
-        for(ResponseElement responseElement : responseElements){
-            externalReferences.addAll(computeExternalReferences(responseElement));
+        for(SchemaElement schemaElement : schemaElements){
+            externalReferences.addAll(computeExternalReferences(schemaElement));
         }
         return externalReferences;
     }
 
-    private List<String> computeExternalReferences(ResponseElement responseElement) {
+    private List<String> computeExternalReferences(SchemaElement schemaElement) {
         List<String> externalReferences = new ArrayList<String>();
-        if(responseElement instanceof ResponseReference){
-            ResponseReference responseReference = (ResponseReference) responseElement;
+        if(schemaElement instanceof SchemaReference){
+            SchemaReference responseReference = (SchemaReference) schemaElement;
             String reference = responseReference.getReference();
             if(!reference.startsWith("#")){
                 externalReferences.add(reference);
             }
         }
-        if(responseElement instanceof ResponseNode || responseElement instanceof ResponseArray){
-            externalReferences.addAll(computeExternalReferences(responseElement.getChildren()));
+        if(schemaElement instanceof SchemaNode || schemaElement instanceof SchemaArray){
+            externalReferences.addAll(computeExternalReferences(schemaElement.getChildren()));
         }
         return externalReferences;
     }
 
-    private List<String> computeInternalReferences(Collection<ResponseElement> responseElements){
+    private List<String> computeInternalReferences(Collection<SchemaElement> schemaElements){
         List<String> internalReferences = new ArrayList<String>();
-        for(ResponseElement responseElement : responseElements){
-            internalReferences.addAll(computeInternalReferences(responseElement));
+        for(SchemaElement schemaElement : schemaElements){
+            internalReferences.addAll(computeInternalReferences(schemaElement));
         }
         return internalReferences;
     }
 
-    private List<String> computeInternalReferences(ResponseElement responseElement) {
+    private List<String> computeInternalReferences(SchemaElement schemaElement) {
         List<String> internalReferences = new ArrayList<String>();
-        if(responseElement instanceof ResponseReference){
-            ResponseReference responseReference = (ResponseReference) responseElement;
+        if(schemaElement instanceof SchemaReference){
+            SchemaReference responseReference = (SchemaReference) schemaElement;
             String reference = responseReference.getReference();
             if(reference.startsWith("#")){
                 internalReferences.add(reference);
             }
         }
-        if(responseElement instanceof ResponseNode || responseElement instanceof ResponseArray){
-            internalReferences.addAll(computeInternalReferences(responseElement.getChildren()));
+        if(schemaElement instanceof SchemaNode || schemaElement instanceof SchemaArray){
+            internalReferences.addAll(computeInternalReferences(schemaElement.getChildren()));
         }
         return internalReferences;
     }
 
-    private Map<String, ResponseElement> loadExternalDefinitions(List<String> externalDefinitions) throws IOException {
-        Map<String, ResponseElement> definitionMap = new HashMap<String, ResponseElement>();
+    private Map<String, SchemaElement> loadExternalDefinitions(List<String> externalDefinitions) throws IOException {
+        Map<String, SchemaElement> definitionMap = new HashMap<String, SchemaElement>();
         Map<String,List<String>> fileNameToTypes = computeFileNameToTypesMap(externalDefinitions);
         for(String fileName : fileNameToTypes.keySet()){
-            Map<String,ResponseElement> types = parser.parseFile(fileName);
+            Map<String,SchemaElement> types = parser.parseFile(fileName);
             for(String typeName : fileNameToTypes.get(fileName)){
                 definitionMap.put(typeName, types.get(typeName));
                 List<String> internalReferences = computeInternalReferences(types.get(typeName));

@@ -15,8 +15,8 @@ public class Canvas {
     public static final Color DEFINED_COLOR = new Color(0xF6E9C6);
     public static final Color ARRAY_COLOR = new Color(0xE3FAC6);
 
-    final float dash1[] = {5.0f};
-    final BasicStroke DASHED_STROKE =
+    private final float dash1[] = {5.0f};
+    private final BasicStroke DASHED_STROKE =
             new BasicStroke(1.0f,
                     BasicStroke.CAP_BUTT,
                     BasicStroke.JOIN_MITER,
@@ -31,30 +31,30 @@ public class Canvas {
         canvasContent.setColor(DEFAULT_COLOR);
     }
 
-    public void drawVertex(ResponseElement element, Rectangle2D.Double box) {
-        if(element instanceof ResponseNode){
+    public void drawVertex(SchemaElement element, Rectangle2D.Double box) {
+        if(element instanceof SchemaNode){
             drawNodeVertex(element, box);
             return;
         }
-        if(element instanceof ResponseValue){
+        if(element instanceof SchemaValue){
             drawValueVertex(element, box);
             return;
         }
-        if(element instanceof ResponseArray){
+        if(element instanceof SchemaArray){
             drawArrayVertex(element,box);
             return;
         }
-        if(element instanceof ResponseEnum){
+        if(element instanceof SchemaEnum){
             drawEnumVertex(element,box);
             return;
         }
-        if(element instanceof ResponseReference){
+        if(element instanceof SchemaReference){
             drawDefinedVertex(element,box);
             return;
         }
     }
 
-    private void drawEnumVertex(ResponseElement element, Rectangle2D.Double box) {
+    private void drawEnumVertex(SchemaElement element, Rectangle2D.Double box) {
         if(element.isRequired()){
             canvasContent.draw(box);
         }else{
@@ -64,7 +64,7 @@ public class Canvas {
         drawCaption(box,caption);
     }
 
-    private void drawNodeVertex(ResponseElement element, Rectangle2D.Double box) {
+    private void drawNodeVertex(SchemaElement element, Rectangle2D.Double box) {
         drawBoxBackground(box,NODE_COLOR);
         if(element.isRequired()) {
             canvasContent.draw(box);
@@ -75,7 +75,7 @@ public class Canvas {
         drawCaption(box, caption);
     }
 
-    private void drawDefinedVertex(ResponseElement element, Rectangle2D.Double box) {
+    private void drawDefinedVertex(SchemaElement element, Rectangle2D.Double box) {
         drawBoxBackground(box,DEFINED_COLOR);
         if(!element.isRequired()){
             drawNotRequiredBox(box);
@@ -86,20 +86,20 @@ public class Canvas {
         drawCaption(box, caption);
     }
 
-    private void drawArrayVertex(ResponseElement element, Rectangle2D.Double box) {
-        ResponseArray responseArray = (ResponseArray) element;
+    private void drawArrayVertex(SchemaElement element, Rectangle2D.Double box) {
+        SchemaArray schemaArray = (SchemaArray) element;
         drawBoxBackground(box, ARRAY_COLOR);
-        if(!responseArray.isRequired()){
+        if(!schemaArray.isRequired()){
             drawNotRequiredBox(box);
         }else{
             canvasContent.draw(box);
         }
         int fontSize = canvasContent.getFont().getSize();
-        final String caption = responseArray.getName()+" : "+responseArray.getType()+"["+responseArray.getMin()+" : "+responseArray.getMax()+"]";
+        final String caption = schemaArray.getName()+" : "+ schemaArray.getType()+"["+ schemaArray.getMin()+" : "+ schemaArray.getMax()+"]";
         drawCaption(box, caption);
     }
 
-    private void drawValueVertex(ResponseElement element, Rectangle2D.Double box) {
+    private void drawValueVertex(SchemaElement element, Rectangle2D.Double box) {
         final String caption = element.getName()+" : "+element.getType();
         drawCaption(box, caption);
         if(element.isRequired()){

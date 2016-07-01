@@ -1,7 +1,7 @@
 package de.brands4friends.aig.util;
 
-import de.brands4friends.aig.domain.ResponseElement;
 import de.brands4friends.aig.domain.Schema;
+import de.brands4friends.aig.domain.SchemaElement;
 import org.abego.treelayout.Configuration;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
@@ -39,14 +39,14 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
                 Configuration.AlignmentInLevel.TowardsRoot);
         int offsetX = 20;
         int offsetY = 70;
-        for(ResponseElement type : schema.getSortedDependencies()){
+        for(SchemaElement type : schema.getSortedDependencies()){
             TreeLayout<TreeNode> treeLayout = createLayout(type);
             offsetY = drawLayout(treeLayout, canvas, offsetX, offsetY,outerboundX);
         }
         canvasProvider.storeCanvas(canvas,outputFileName,offsetY,outerboundX);
     }
 
-     private TreeLayout<TreeNode> createLayout(ResponseElement element){
+     private TreeLayout<TreeNode> createLayout(SchemaElement element){
          TreeNode root = new TreeNode(element);
          DefaultTreeForTreeLayout<TreeNode> tree = new DefaultTreeForTreeLayout<TreeNode>(root);
          for(TreeNode child : root.getChildren()){
@@ -139,7 +139,7 @@ public class CanvasIllustrationGenerator implements IllustrationGenerator {
     }
 
     private boolean isAncestorOfAny(TreeNode element,List<TreeNode> ancestors){
-        ResponseElement elementPayload = element.getElement();
+        SchemaElement elementPayload = element.getElement();
         for(TreeNode ancestor : ancestors){
             if(ancestor.getElement().isAncestor(elementPayload)){
                 return true;

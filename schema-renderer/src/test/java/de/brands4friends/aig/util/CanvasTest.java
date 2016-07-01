@@ -1,8 +1,8 @@
 package de.brands4friends.aig.util;
 
-import de.brands4friends.aig.domain.ResponseElement;
-import de.brands4friends.aig.domain.ResponseReference;
-import de.brands4friends.aig.domain.ResponseValue;
+import de.brands4friends.aig.domain.SchemaElement;
+import de.brands4friends.aig.domain.SchemaReference;
+import de.brands4friends.aig.domain.SchemaValue;
 import org.easymock.EasyMockSupport;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class CanvasTest extends EasyMockSupport {
 
     //@Test
     public void testDrawVertexWithValue() throws Exception {
-        ResponseValue responseValue = new ResponseValue("my-value","my-type",true);
+        SchemaValue responseValue = new SchemaValue("my-value","my-type",true);
         Font mockFont = createMock(Font.class);
         Color mockColor = createNiceMock(Color.class);
         expect(mockFont.getSize()).andReturn(FONT_HEIGHT);
@@ -54,14 +54,14 @@ public class CanvasTest extends EasyMockSupport {
 
     //@Test
     public void testDrawVertexWithUnrequiredValue() throws Exception {
-        ResponseValue responseValue = new ResponseValue("my-value","my-type",false);
+        SchemaValue responseValue = new SchemaValue("my-value","my-type",false);
         instance.drawVertex(responseValue,box);
     }
 
 
     //@Test
     public void testDrawVertexWithReference() throws Exception {
-        ResponseElement element = new ResponseReference("my-ref","my-type","#/definitions/my-type",true);
+        SchemaElement element = new SchemaReference("my-ref","my-type","#/definitions/my-type",true);
         Font mockFont = createMock(Font.class);
         Color mockColor = createNiceMock(Color.class);
         expect(mockFont.getSize()).andReturn(FONT_HEIGHT);
@@ -75,7 +75,7 @@ public class CanvasTest extends EasyMockSupport {
 
     //@Test
     public void testDrawVertexWithUnrequiredReference() throws Exception {
-        ResponseElement responseValue = new ResponseReference("my-ref","my-type","#/definitions/my-type",false);
+        SchemaElement responseValue = new SchemaReference("my-ref","my-type","#/definitions/my-type",false);
 
     }
     @Test
