@@ -70,6 +70,7 @@ public class Schema {
             }
             return sortedDependencies;
         }
+
         public Schema build(){
             return new Schema(definedTypes,computeDependencies());
         }
